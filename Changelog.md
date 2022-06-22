@@ -15,5 +15,12 @@ Initialized project with project description (in Polish) and an empty Unity proj
 - Imported TextMeshPro assets
 - Added sketches of people and building classes.
 
+## [0.0.1] - 2022-06-22
+
+- Fixed clock (had a 24-hour clock running on a 12-hour one)
+- Added event functionality
+- Added basic test subjects (child with a home and a school)
+- Added a basic house model
+- Imported the universal render pipeline
 
 

@@ -40,12 +40,18 @@ public class GameController : MonoBehaviour
 
     public delegate void DelEventHandler();
     public static event DelEventHandler NewDay;
+    public static event DelEventHandler HandleSecond;
 
 
 
     //=================================
     // Simulation loop
     //=================================
+
+    public static float TimeToSeconds(int hour, int minutes)
+    {
+        return hour * 60f + (float)minutes;
+    }
 
     void SetTimeScale(float newScale)
     {
@@ -56,22 +62,24 @@ public class GameController : MonoBehaviour
 
     IEnumerator GameLoop()
     {
+        NewDay();
+
         while (true)
         {
+
             Debug.Log(Time.fixedDeltaTime);
 
             while (!SimulationRunning)
                 yield return new WaitForSecondsRealtime(Time.fixedDeltaTime);
 
-
-
             CurrentTime += 1;
             if(CurrentTime >= secondsInDay)
             {
-                //NewDay();
+                NewDay();
                 CurrentTime = 0f;
             }
 
+            HandleSecond();
 
 
             yield return new WaitForSecondsRealtime(Time.fixedDeltaTime); //move to next frame
