@@ -2,11 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class Building : MonoBehaviour
+namespace SimulationNS
 {
-    [SerializeField]
-    string name;
-    List<Vector3> EntrancePositions;
+    public abstract class Building : MonoBehaviour
+    {
+        [SerializeField]
+        string name;
+        [SerializeField]
+        Transform BuildingCenter;
 
 
+        public Vector3 GetBuildingCenter() { return BuildingCenter.position; }
+
+
+    }
 }

@@ -53,6 +53,12 @@ public class GameController : MonoBehaviour
         return hour * 60f + (float)minutes;
     }
 
+    public static float TimeToSeconds(Vector2Int time)
+    {
+        return TimeToSeconds(time.x, time.y);
+    }
+
+
     void SetTimeScale(float newScale)
     {
         CurrentTimeScale = newScale;

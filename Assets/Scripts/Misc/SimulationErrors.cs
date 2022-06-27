@@ -17,4 +17,6 @@ namespace SimulationNS
 
         public UninitializedSimulationStructuresException(string message) : base(message) { }
     }
+
+
 }

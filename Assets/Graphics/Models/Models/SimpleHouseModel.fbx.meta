@@ -1,9 +1,19 @@
 fileFormatVersion: 2
-guid: 39288274d49a74b48a8937dfe849fdbc
+guid: b4b88304ac7005143935a1cea26ec73f
 ModelImporter:
   serializedVersion: 20101
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Material.003
+    second: {fileID: 2100000, guid: 30512574b5a559b44a02fb3ffee393d3, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Material.004
+    second: {fileID: 2100000, guid: c88bc0d0d3cfe924e833de12c9a5c16c, type: 2}
   materials:
     materialImportMode: 1
     materialName: 0
@@ -57,7 +67,7 @@ ModelImporter:
     meshOptimizationFlags: -1
     indexFormat: 0
     secondaryUVAngleDistortion: 8
-    secondaryUVAreaDistortion: 15
+    secondaryUVAreaDistortion: 15.000001
     secondaryUVHardAngle: 88
     secondaryUVMarginMethod: 1
     secondaryUVMinLightmapResolution: 40

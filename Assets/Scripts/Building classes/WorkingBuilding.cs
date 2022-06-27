@@ -2,24 +2,40 @@
 using System.Collections.Generic;
 using UnityEngine;
 using SimulationNS;
+using System;
 
-public class WorkingBuilding : Building
+namespace SimulationNS
 {
-    [SerializeField]
-    List<Vector2> ShiftTimes;
-
-    public Vector2 GetShift(int index) => ShiftTimes[index];
-    public List<Vector2> GetAllShifts(int index) => ShiftTimes;
-
-    // Start is called before the first frame update
-    void Start()
+    public class WorkingBuilding : Building
     {
-        
-    }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        [System.Serializable]
+        public struct Shift
+        {
+            public Vector2Int shiftStart, shiftEnd;
+        }
+
+        [SerializeField]
+        List<Shift> ShiftTimes;
+
+        public Shift GetRandomShift()
+        {
+            if (ShiftTimes.Count == 0) throw new UninitializedSimulationStructuresException("Working building has no shifts.");
+
+            System.Random shiftIndex = new System.Random();
+            return ShiftTimes[shiftIndex.Next(ShiftTimes.Count)];
+        }
+
+        // Start is called before the first frame update
+        void Start()
+        {
+
+        }
+
+        // Update is called once per frame
+        void Update()
+        {
+
+        }
     }
 }

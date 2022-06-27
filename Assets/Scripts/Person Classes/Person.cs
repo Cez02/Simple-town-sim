@@ -9,9 +9,9 @@ namespace SimulationNS
     [System.Serializable]
     public class MoveEvent{
 
-        public float expectedStart { get; private set; }
-        public float expectedEnd { get; private set; }
-        public Building destination { get; private set; }
+        public float expectedStart;
+        public float expectedEnd;
+        public Building destination;
 
         public MoveEvent(float _expectedStart, float _expectedEnd, Building destination_)
         {
@@ -30,14 +30,23 @@ namespace SimulationNS
         // Variables
         //=================================
 
+        [Header("Custom event queue variables")]
+        public bool customEventQueueInitialized = false;
+
+        public List<MoveEvent> customEventQueue = new List<MoveEvent>();
+
+        [Header("Standard variables")]
         [SerializeField]
         protected string name;
         [SerializeField]
         protected int age;
         [SerializeField]
-        protected Building dwelling;
+        protected DwellingBuilding dwelling;
+
 
         protected Queue<MoveEvent> eventQueue;
+
+
 
         protected MoveEvent currentEvent;
 
@@ -55,6 +64,17 @@ namespace SimulationNS
         //Prepares new event queue for given simulation day
         public abstract void PrepareEventQueue();
 
+        protected void CopyCustomQueue()
+        {
+
+            if (customEventQueue == null || customEventQueue.Count == 0)
+                throw new UninitializedSimulationStructuresException("Custom queue is empty.");
+
+            foreach (var x in customEventQueue)
+            {
+                eventQueue.Enqueue(x);
+            }
+        }
 
         //helper method
         float distance2D(Vector3 a, Vector3 b)
@@ -66,7 +86,7 @@ namespace SimulationNS
         //otherwise we must go to said building
         public void HandleEvent()
         {
-            if (currentEvent == null || distance2D(transform.position, currentEvent.destination.transform.position) < 0.2f)
+            if (currentEvent == null || distance2D(transform.position, currentEvent.destination.GetBuildingCenter()) < 0.2f)
             {
                 thisNMA.isStopped = true;
                 GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
@@ -77,7 +97,7 @@ namespace SimulationNS
             {
                 GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
                 thisNMA.isStopped = false;
-                thisNMA.SetDestination(currentEvent.destination.transform.position);
+                thisNMA.SetDestination(currentEvent.destination.GetBuildingCenter());
             }
         } 
 

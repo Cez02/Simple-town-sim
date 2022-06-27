@@ -11,33 +11,40 @@ public class Child : Person
 
     override public void PrepareEventQueue()
     {
+        if (customEventQueueInitialized)
+        {
+            CopyCustomQueue();
+            return;
+        }
+
+
         if (BuildingSchool == null) throw new UninitializedSimulationStructuresException(
                                                "Uninitialized school building in child.");
 
         //Here we initialize the child's school day
         eventQueue = new Queue<MoveEvent>();
-        //var SchoolShift = BuildingSchool.GetShift(0);
+        var schoolShift = BuildingSchool.GetRandomShift();
 
         eventQueue.Enqueue(
             new MoveEvent(
                 GameController.TimeToSeconds(0, 0),
-                GameController.TimeToSeconds(7, 0),
+                GameController.TimeToSeconds(new Vector2Int(schoolShift.shiftStart.x - 1, schoolShift.shiftStart.y)),
                 dwelling));
+
+   
 
         eventQueue.Enqueue(
             new MoveEvent(
-                GameController.TimeToSeconds(8, 0),
-                GameController.TimeToSeconds(15, 20),
+                GameController.TimeToSeconds(schoolShift.shiftStart),
+                GameController.TimeToSeconds(schoolShift.shiftEnd),
                 BuildingSchool));
 
         eventQueue.Enqueue(
             new MoveEvent(
-                GameController.TimeToSeconds(15, 20),
+                GameController.TimeToSeconds(schoolShift.shiftEnd),
                 GameController.TimeToSeconds(23, 59),
                 dwelling));
-
-
-
+        
 
     }
 
