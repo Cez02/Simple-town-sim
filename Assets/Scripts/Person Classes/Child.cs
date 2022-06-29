@@ -28,7 +28,7 @@ public class Child : Person
         eventQueue.Enqueue(
             new MoveEvent(
                 GameController.TimeToSeconds(0, 0),
-                GameController.TimeToSeconds(new Vector2Int(schoolShift.shiftStart.x - 1, schoolShift.shiftStart.y)),
+                GameController.TimeToSeconds(schoolShift.shiftStart),
                 dwelling));
 
    

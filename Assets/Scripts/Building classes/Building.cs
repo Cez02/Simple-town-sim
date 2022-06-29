@@ -11,9 +11,12 @@ namespace SimulationNS
         [SerializeField]
         Transform BuildingCenter;
 
+        [SerializeField]
+        Vector2Int gridDimensions;
+
 
         public Vector3 GetBuildingCenter() { return BuildingCenter.position; }
-
+        public Vector2Int GetGridDimensions() { return gridDimensions; }
 
     }
 }

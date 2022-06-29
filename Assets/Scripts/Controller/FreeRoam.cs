@@ -1,158 +1,145 @@
-﻿using UnityEngine;
-using System.Collections;
-using UnityEngine.UI;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UnityEngine;
 
+/// <summary>
+/// A simple free camera to be added to a Unity game object.
+/// 
+/// Keys:
+///	wasd / arrows	- movement
+///	q/e 			- up/down (local space)
+///	r/f 			- up/down (world space)
+///	pageup/pagedown	- up/down (world space)
+///	hold shift		- enable fast movement mode
+///	right mouse  	- enable free look
+///	mouse			- free look / rotation
+///     
+/// </summary>
 public class FreeRoam : MonoBehaviour
 {
-    //Script for free-roam camera movement with border and height limitations
-    //the arrow keys are directional
-    //the scroll wheel moves the camrea up and down and will face down as the view rises (can be disabled)
-    //depressing the right mouse button and scrolling left/right will change the left/right view
-    //the camrea must be a child object of whichever game object this script controls
+    /// <summary>
+    /// Normal speed of camera movement.
+    /// </summary>
+    public float movementSpeed = 10f;
 
-    //The following values (non-placeholder) can be changed to adjust for the scale and scope of camera movement:
+    /// <summary>
+    /// Speed of camera movement when shift is held down,
+    /// </summary>
+    public float fastMovementSpeed = 100f;
 
-    private float moveFactor = 5.0f;  //movement rate of camrea movement (keys)
-    private float moveFactorMax = 150.0f;  //maximum movement rate of camrea movement (keys)
-    private float MoveFactorOriginal;  //placeholder for moveFactor
-    private float moveFactorIncrement;  //paceholder for increment rate
-    private float moveFactorIncrementRate = 0.5f;  //rate (multiply) by which moveFactor will increase (duration * time)
+    /// <summary>
+    /// Sensitivity for free look.
+    /// </summary>
+    public float freeLookSensitivity = 3f;
 
-    private float tranformCameraXFactor = 8.0f;  //x axis  factor during change in y axis (scroll) / set value to 1.0f to disable rotation
+    /// <summary>
+    /// Amount to zoom the camera when using the mouse wheel.
+    /// </summary>
+    public float zoomSensitivity = 10f;
 
-    private float mouseX;  //placeholder for mouse rotation
-    private float mouseScroll;  //placeholder for mouse scroll
-    private float mouseScrollFactor = -11.5f;  //rate at which the mouse scroll movement
-    private float mouseScrollBackThreshold = 35.0f; //threshold where the view stops moving when the angle moves up (to keep objects in the immideate view visible)
-    private float mouseSideFactor = 2.5f;  //rate by which the side panning will turn
+    /// <summary>
+    /// Amount to zoom the camera when using the mouse wheel (fast mode).
+    /// </summary>
+    public float fastZoomSensitivity = 50f;
 
-    private int maxY = 100;  //maximum camera height
-    private int minY = 10;  //minimum camera height
-    private float maxX = 100.0f;  //maximum camera position x (left)
-    private float minX = -100.0f;  //maximum camera position x (right)
-    private float maxZ = 100.0f;  //maximum camera position z (forward)
-    private float minZ = -100.0f;  //maximum camera position z (back)
-
-    public string targetCamera = "MainCamera";  //child object target tag
-    public GameObject ChildCamera;
-
-    void Start()
-    {
-        MoveFactorOriginal = moveFactor;
-        moveFactorIncrement = moveFactor * moveFactorIncrementRate;
-        ChildCamera = GameObject.FindGameObjectWithTag(targetCamera);
-    }
+    /// <summary>
+    /// Set to true when free looking (on right mouse button).
+    /// </summary>
+    private bool looking = false;
 
     void Update()
     {
-        if (moveFactor > moveFactorMax)
+        var fastMode = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+        var movementSpeed = fastMode ? this.fastMovementSpeed : this.movementSpeed;
+
+        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
         {
-            moveFactor = moveFactorMax;
+            transform.position = transform.position + (-transform.right * movementSpeed * Time.deltaTime);
         }
 
-        if (Input.GetKey("up"))
+        if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
         {
-            transform.Translate(Vector3.forward * Time.deltaTime * moveFactor, Space.Self);
-            moveFactor = moveFactor + moveFactorIncrement;
+            transform.position = transform.position + (transform.right * movementSpeed * Time.deltaTime);
         }
 
-        if (Input.GetKey("down"))
+        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
         {
-            transform.Translate(Vector3.back * Time.deltaTime * moveFactor, Space.Self);
-            moveFactor = moveFactor + moveFactorIncrement;
+            transform.position = transform.position + (transform.forward * movementSpeed * Time.deltaTime);
         }
 
-        if (Input.GetKey("left"))
+        if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
         {
-            transform.Translate(Vector3.left * Time.deltaTime * moveFactor, Space.Self);
-            moveFactor = moveFactor + moveFactorIncrement;
+            transform.position = transform.position + (-transform.forward * movementSpeed * Time.deltaTime);
         }
 
-        if (Input.GetKey("right"))
+        if (Input.GetKey(KeyCode.Q))
         {
-            transform.Translate(Vector3.right * Time.deltaTime * moveFactor, Space.Self);
-            moveFactor = moveFactor + moveFactorIncrement;
+            transform.position = transform.position + (transform.up * movementSpeed * Time.deltaTime);
         }
 
-        if (Input.GetKeyUp("up"))
+        if (Input.GetKey(KeyCode.E))
         {
-            moveFactor = MoveFactorOriginal;
+            transform.position = transform.position + (-transform.up * movementSpeed * Time.deltaTime);
         }
 
-        if (Input.GetKeyUp("down"))
+        if (Input.GetKey(KeyCode.R) || Input.GetKey(KeyCode.PageUp))
         {
-            moveFactor = MoveFactorOriginal;
+            transform.position = transform.position + (Vector3.up * movementSpeed * Time.deltaTime);
         }
 
-        if (Input.GetKeyUp("left"))
+        if (Input.GetKey(KeyCode.F) || Input.GetKey(KeyCode.PageDown))
         {
-            moveFactor = MoveFactorOriginal;
+            transform.position = transform.position + (-Vector3.up * movementSpeed * Time.deltaTime);
         }
 
-        if (Input.GetKeyUp("right"))
+        if (looking)
         {
-            moveFactor = MoveFactorOriginal;
+            float newRotationX = transform.localEulerAngles.y + Input.GetAxis("Mouse X") * freeLookSensitivity;
+            float newRotationY = transform.localEulerAngles.x - Input.GetAxis("Mouse Y") * freeLookSensitivity;
+            transform.localEulerAngles = new Vector3(newRotationY, newRotationX, 0f);
         }
 
-        if (Input.GetMouseButton(1))
+        float axis = Input.GetAxis("Mouse ScrollWheel");
+        if (axis != 0)
         {
-            mouseX = Input.GetAxis("Mouse X");
-            transform.Rotate(new Vector3(0, (mouseX * mouseSideFactor), 0), Space.World);
+            var zoomSensitivity = fastMode ? this.fastZoomSensitivity : this.zoomSensitivity;
+            transform.position = transform.position + transform.forward * axis * zoomSensitivity;
         }
 
-        if (ChildCamera.transform.position.y > minY)
+        if (Input.GetKeyDown(KeyCode.Mouse1))
         {
-            mouseScroll = (Input.GetAxis("Mouse ScrollWheel") * mouseScrollFactor);
-
-            if (ChildCamera.transform.position.y < mouseScrollBackThreshold)
-            {
-                ChildCamera.transform.position += new Vector3(0, mouseScroll, -1 * mouseScroll);
-            }
-
-            if (ChildCamera.transform.position.y > mouseScrollBackThreshold)
-            {
-                ChildCamera.transform.position += new Vector3(0, mouseScroll, 0);
-
-            }
+            StartLooking();
         }
-
-        if (ChildCamera.transform.position.y < maxY)
+        else if (Input.GetKeyUp(KeyCode.Mouse1))
         {
-            mouseScroll = (Input.GetAxis("Mouse ScrollWheel") * mouseScrollFactor);
-            ChildCamera.transform.position += new Vector3(0, mouseScroll, 0);
+            StopLooking();
         }
-
-        if (ChildCamera.transform.position.y < minY)
-        {
-            ChildCamera.transform.position = new Vector3(ChildCamera.transform.position.x, minY, ChildCamera.transform.position.z);
-        }
-
-        if (ChildCamera.transform.position.y > maxY)
-        {
-            ChildCamera.transform.position = new Vector3(ChildCamera.transform.position.x, maxY, ChildCamera.transform.position.z);
-        }
-
-        if (transform.position.x > maxX)
-        {
-            transform.position = new Vector3(maxX, transform.position.y, transform.position.z);
-        }
-
-        if (transform.position.x < minX)
-        {
-            transform.position = new Vector3(minX, transform.position.y, transform.position.z);
-        }
-
-        if (transform.position.z > maxZ)
-        {
-            transform.position = new Vector3(transform.position.x, transform.position.y, maxZ);
-        }
-
-        if (transform.position.z < minZ)
-        {
-            transform.position = new Vector3(transform.position.x, transform.position.y, minZ);
-        }
-
-        ChildCamera.transform.eulerAngles = new Vector3((ChildCamera.transform.position.y / (minY + 0.01f) * tranformCameraXFactor), ChildCamera.transform.eulerAngles.y, ChildCamera.transform.eulerAngles.z);
     }
 
+    void OnDisable()
+    {
+        StopLooking();
+    }
+
+    /// <summary>
+    /// Enable free looking.
+    /// </summary>
+    public void StartLooking()
+    {
+        looking = true;
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+    }
+
+    /// <summary>
+    /// Disable free looking.
+    /// </summary>
+    public void StopLooking()
+    {
+        looking = false;
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+    }
 }

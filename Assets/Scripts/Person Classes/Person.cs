@@ -44,7 +44,7 @@ namespace SimulationNS
         protected DwellingBuilding dwelling;
 
 
-        protected Queue<MoveEvent> eventQueue;
+        protected Queue<MoveEvent> eventQueue = new Queue<MoveEvent>();
 
 
 
@@ -53,9 +53,6 @@ namespace SimulationNS
         // Path finding variables
 
         NavMeshAgent thisNMA;
-
-        bool moving = false;
-
 
         //=================================
         // Event methods
@@ -77,17 +74,27 @@ namespace SimulationNS
         }
 
         //helper method
-        float distance2D(Vector3 a, Vector3 b)
+        public static float distance2D(Vector3 a, Vector3 b)
         {
-            return (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y);
+            return (a.x - b.x) * (a.x - b.x) + (a.z - b.z) * (a.z - b.z);
         }
 
+        public bool Moving = true;
+        public float dis = 0f;
+        public Vector3 first, second;
         //if person is in target building, then do nothing
         //otherwise we must go to said building
         public void HandleEvent()
         {
+            if (currentEvent != null)
+            {
+                first = transform.position;
+                second = currentEvent.destination.GetBuildingCenter();
+                dis = distance2D(transform.position, currentEvent.destination.GetBuildingCenter());
+            }
             if (currentEvent == null || distance2D(transform.position, currentEvent.destination.GetBuildingCenter()) < 0.2f)
             {
+                Moving = false;
                 thisNMA.isStopped = true;
                 GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
                 return;
@@ -95,6 +102,7 @@ namespace SimulationNS
 
             if (thisNMA.destination != currentEvent.destination.transform.position)
             {
+                Moving = true;
                 GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
                 thisNMA.isStopped = false;
                 thisNMA.SetDestination(currentEvent.destination.GetBuildingCenter());
@@ -125,10 +133,17 @@ namespace SimulationNS
             }
         }
 
-
+        public void ResetPersonPosition()
+        {
+            Debug.Log("Data:");
+            Debug.Log(transform.position);
+            transform.position = dwelling.GetBuildingCenter();
+            Debug.Log(transform.position);
+        }
 
         public virtual void Start()
         {
+            GameController.PrepareSimulation += ResetPersonPosition;
             thisNMA = GetComponent<NavMeshAgent>();
             GameController.NewDay += PrepareEventQueue;
             GameController.HandleSecond += UpdateEvents;
@@ -149,7 +164,7 @@ namespace SimulationNS
         protected void CheckSteeringTargetPosition()
         {
             float distanceST = Vector3.Distance(thisNMA.transform.position, thisNMA.steeringTarget);
-            if (distanceST <= 0.1f) //distance to next edge on nav mesh
+            if (distanceST <= 0.5f) //distance to next edge on nav mesh
             {
                 if (_distanceStearingTarget < distanceST)
                 {
@@ -168,6 +183,7 @@ namespace SimulationNS
             GameController.NewDay -= PrepareEventQueue;
             GameController.HandleSecond -= UpdateEvents;
             GameController.HandleSecond -= HandleEvent;
+            GameController.PrepareSimulation -= ResetPersonPosition;
         }
     }
 }

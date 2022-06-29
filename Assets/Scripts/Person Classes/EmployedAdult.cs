@@ -27,7 +27,7 @@ namespace SimulationNS
             eventQueue.Enqueue(
                 new MoveEvent(
                     GameController.TimeToSeconds(0, 0),
-                    GameController.TimeToSeconds(new Vector2Int(workShift.shiftStart.x - 1, workShift.shiftStart.y)),
+                    GameController.TimeToSeconds(workShift.shiftStart),
                     dwelling));
 
             eventQueue.Enqueue(
@@ -42,6 +42,14 @@ namespace SimulationNS
                     GameController.TimeToSeconds(23, 59),
                     dwelling));
 
+        }
+
+        public void PrepareAdult(string name_, int age_, DwellingBuilding house, WorkingBuilding whereWork_)
+        {
+            name = name_;
+            age = age_;
+            placeOfEmployment = whereWork_;
+            dwelling = house;
         }
 
         public void Start()

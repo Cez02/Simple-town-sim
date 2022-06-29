@@ -8,6 +8,7 @@ namespace SimulationNS
 {
     public class WorkingBuilding : Building
     {
+        public static List<WorkingBuilding> buildings = new List<WorkingBuilding>();
 
         [System.Serializable]
         public struct Shift
@@ -22,14 +23,13 @@ namespace SimulationNS
         {
             if (ShiftTimes.Count == 0) throw new UninitializedSimulationStructuresException("Working building has no shifts.");
 
-            System.Random shiftIndex = new System.Random();
-            return ShiftTimes[shiftIndex.Next(ShiftTimes.Count)];
+            return ShiftTimes[GameController.RandomNumberGenerator.Next()%ShiftTimes.Count];
         }
 
         // Start is called before the first frame update
         void Start()
         {
-
+            buildings.Add(this);
         }
 
         // Update is called once per frame

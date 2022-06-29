@@ -41,8 +41,13 @@ public class GameController : MonoBehaviour
     public delegate void DelEventHandler();
     public static event DelEventHandler NewDay;
     public static event DelEventHandler HandleSecond;
+    public static event DelEventHandler PrepareSimulation;
 
+    public static System.Random RandomNumberGenerator = new System.Random();
 
+    // ==== Generation related ====
+
+    [SerializeField] SimulationNS.MapGenerator MG;
 
     //=================================
     // Simulation loop
@@ -106,6 +111,8 @@ public class GameController : MonoBehaviour
 
     public void BeginSimulation()
     {
+        
+        if(PrepareSimulation != null) PrepareSimulation();
         SimulationRunning = true;
         SetTimeScale(CurrentTimeScale);
         StartCoroutine(GameLoop());
