@@ -7,7 +7,7 @@ using SimulationNS;
 public class Child : Person
 {
     [SerializeField]
-    WorkingBuilding BuildingSchool;
+    SchoolBuilding BuildingSchool;
 
     override public void PrepareEventQueue()
     {
@@ -46,6 +46,14 @@ public class Child : Person
                 dwelling));
         
 
+    }
+
+    public void PrepareChild(string name_, int age_, DwellingBuilding house, SchoolBuilding whereSchool_)
+    {
+        name = name_;
+        age = age_;
+        BuildingSchool = whereSchool_;
+        dwelling = house;
     }
 
     // Start is called before the first frame update

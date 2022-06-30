@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using SimulationNS;
 
 public class GameController : MonoBehaviour
 {
@@ -48,6 +49,35 @@ public class GameController : MonoBehaviour
     // ==== Generation related ====
 
     [SerializeField] SimulationNS.MapGenerator MG;
+
+    // ===== People related =====
+
+    public Person currentlySelectedPerson;
+
+    public string[] names =
+    {
+        "Shiv Fields",
+        "Sharmin Landry",
+        "Layla-Mae Rojas",
+        "Cordelia Yu",
+        "Mcauley Vu",
+        "Lianne Wood",
+        "Ami Key",
+        "Maddie Flores",
+        "Lennie Timms",
+        "Emre Flynn",
+        "Anwar Walsh",
+        "Isla-Rae Knapp",
+        "Timur Bowler",
+        "Catrina French",
+        "Falak Ponce",
+        "Danyaal Moon",
+        "Juliet Barrett",
+        "Abraham Maddox",
+        "Isla-Grace Marquez",
+        "Jaiden Sears"
+    };
+
 
     //=================================
     // Simulation loop
@@ -109,6 +139,11 @@ public class GameController : MonoBehaviour
         SimulationRunning = false;
     }
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape)) Application.Quit();
+    }
+
     public void BeginSimulation()
     {
         
@@ -136,9 +171,13 @@ public class GameController : MonoBehaviour
         SimulationRunning = true;
     }
 
-    // Update is called once per frame
-    void Update()
+
+    // people related
+
+    public void DeselectPerson()
     {
-        
+        currentlySelectedPerson.DeselectPerson();
+        currentlySelectedPerson = null;
     }
+
 }

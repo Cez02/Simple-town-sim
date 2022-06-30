@@ -49,49 +49,53 @@ public class FreeRoam : MonoBehaviour
     /// </summary>
     private bool looking = false;
 
+    const float customDeltaTime = 0.0042f;
+
     void Update()
     {
+        //Debug.Log(Time.deltaTime);
+
         var fastMode = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
         var movementSpeed = fastMode ? this.fastMovementSpeed : this.movementSpeed;
 
         if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
         {
-            transform.position = transform.position + (-transform.right * movementSpeed * Time.deltaTime);
+            transform.position = transform.position + (-transform.right * movementSpeed * customDeltaTime);
         }
 
         if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
         {
-            transform.position = transform.position + (transform.right * movementSpeed * Time.deltaTime);
+            transform.position = transform.position + (transform.right * movementSpeed * customDeltaTime);
         }
 
         if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
         {
-            transform.position = transform.position + (transform.forward * movementSpeed * Time.deltaTime);
+            transform.position = transform.position + (transform.forward * movementSpeed * customDeltaTime);
         }
 
         if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
         {
-            transform.position = transform.position + (-transform.forward * movementSpeed * Time.deltaTime);
+            transform.position = transform.position + (-transform.forward * movementSpeed * customDeltaTime);
         }
 
         if (Input.GetKey(KeyCode.Q))
         {
-            transform.position = transform.position + (transform.up * movementSpeed * Time.deltaTime);
+            transform.position = transform.position + (transform.up * movementSpeed * customDeltaTime);
         }
 
         if (Input.GetKey(KeyCode.E))
         {
-            transform.position = transform.position + (-transform.up * movementSpeed * Time.deltaTime);
+            transform.position = transform.position + (-transform.up * movementSpeed * customDeltaTime);
         }
 
         if (Input.GetKey(KeyCode.R) || Input.GetKey(KeyCode.PageUp))
         {
-            transform.position = transform.position + (Vector3.up * movementSpeed * Time.deltaTime);
+            transform.position = transform.position + (Vector3.up * movementSpeed * customDeltaTime);
         }
 
         if (Input.GetKey(KeyCode.F) || Input.GetKey(KeyCode.PageDown))
         {
-            transform.position = transform.position + (-Vector3.up * movementSpeed * Time.deltaTime);
+            transform.position = transform.position + (-Vector3.up * movementSpeed * customDeltaTime);
         }
 
         if (looking)

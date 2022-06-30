@@ -8,6 +8,14 @@ namespace SimulationNS
 {
     public class WorkingBuilding : Building
     {
+        static string[] workingBuildingNames =
+        {
+            "ZF Office",
+            "Google office",
+            "Aperture science office",
+            "Microsoft office"
+        };
+
         public static List<WorkingBuilding> buildings = new List<WorkingBuilding>();
 
         [System.Serializable]
@@ -24,6 +32,11 @@ namespace SimulationNS
             if (ShiftTimes.Count == 0) throw new UninitializedSimulationStructuresException("Working building has no shifts.");
 
             return ShiftTimes[GameController.RandomNumberGenerator.Next()%ShiftTimes.Count];
+        }
+
+        public void SetRandomName()
+        {
+            SetName(workingBuildingNames[GameController.RandomNumberGenerator.Next() % workingBuildingNames.Length]);
         }
 
         // Start is called before the first frame update

@@ -18,5 +18,9 @@ namespace SimulationNS
         public Vector3 GetBuildingCenter() { return BuildingCenter.position; }
         public Vector2Int GetGridDimensions() { return gridDimensions; }
 
+        public string GetName() { return name; }
+
+        public void SetName(string v) { name = v; }
+
     }
 }

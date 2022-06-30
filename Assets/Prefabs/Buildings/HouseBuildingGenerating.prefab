@@ -492,7 +492,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ebe88b9f88acb546aefe1871b04e5b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  name: Test building
+  name: House
   BuildingCenter: {fileID: 1327696223555719120}
   gridDimensions: {x: 0, y: 0}
   persons:
@@ -512,6 +512,7 @@ MonoBehaviour:
   numberOfPeople: 2
   whereToSpawn: {fileID: 1327696223555719120}
   EmployedAdult: {fileID: 3093137235655415957, guid: 12a03fa72b60cb44896a9e1d82f30a9e, type: 3}
+  Child: {fileID: 2480094897014761897, guid: 4d229d585fb5ccc43a85cfb7791f2609, type: 3}
 --- !u!1 &5694408789825656632
 GameObject:
   m_ObjectHideFlags: 0

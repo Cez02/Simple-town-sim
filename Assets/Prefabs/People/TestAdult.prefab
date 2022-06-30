@@ -93,7 +93,7 @@ CapsuleCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3093137235655415966}
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_Enabled: 1
   m_Radius: 0.5
   m_Height: 2
@@ -154,10 +154,9 @@ MonoBehaviour:
   name: Jacek
   age: 25
   dwelling: {fileID: 0}
-  Moving: 1
+  normalMaterial: {fileID: 2100000, guid: 23bbfed2b59997642986b2431a9b5c3e, type: 2}
+  hoverMaterial: {fileID: 2100000, guid: 16220b8227ae7c446a779ef98d316d2c, type: 2}
   dis: 0
-  first: {x: 0, y: 0, z: 0}
-  second: {x: 0, y: 0, z: 0}
   Children:
   - {fileID: 0}
   placeOfEmployment: {fileID: 0}

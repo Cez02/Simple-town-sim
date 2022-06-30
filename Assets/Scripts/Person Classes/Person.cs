@@ -43,16 +43,19 @@ namespace SimulationNS
         [SerializeField]
         protected DwellingBuilding dwelling;
 
+        [SerializeField] Material normalMaterial, hoverMaterial;
+
 
         protected Queue<MoveEvent> eventQueue = new Queue<MoveEvent>();
-
-
 
         protected MoveEvent currentEvent;
 
         // Path finding variables
 
         NavMeshAgent thisNMA;
+
+
+
 
         //=================================
         // Event methods
@@ -79,9 +82,8 @@ namespace SimulationNS
             return (a.x - b.x) * (a.x - b.x) + (a.z - b.z) * (a.z - b.z);
         }
 
-        public bool Moving = true;
         public float dis = 0f;
-        public Vector3 first, second;
+        Vector3 first, second;
         //if person is in target building, then do nothing
         //otherwise we must go to said building
         public void HandleEvent()
@@ -90,11 +92,9 @@ namespace SimulationNS
             {
                 first = transform.position;
                 second = currentEvent.destination.GetBuildingCenter();
-                dis = distance2D(transform.position, currentEvent.destination.GetBuildingCenter());
             }
             if (currentEvent == null || distance2D(transform.position, currentEvent.destination.GetBuildingCenter()) < 0.2f)
             {
-                Moving = false;
                 thisNMA.isStopped = true;
                 GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
                 return;
@@ -102,7 +102,6 @@ namespace SimulationNS
 
             if (thisNMA.destination != currentEvent.destination.transform.position)
             {
-                Moving = true;
                 GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
                 thisNMA.isStopped = false;
                 thisNMA.SetDestination(currentEvent.destination.GetBuildingCenter());
@@ -164,7 +163,7 @@ namespace SimulationNS
         protected void CheckSteeringTargetPosition()
         {
             float distanceST = Vector3.Distance(thisNMA.transform.position, thisNMA.steeringTarget);
-            if (distanceST <= 0.5f) //distance to next edge on nav mesh
+            if (distanceST <= 0.43f) //distance to next edge on nav mesh
             {
                 if (_distanceStearingTarget < distanceST)
                 {
@@ -177,6 +176,12 @@ namespace SimulationNS
             }
         }
 
+        public string GetDestinationName()
+        {
+            return currentEvent.destination.GetName();
+        }
+
+        public string GetName() { return name; }
 
         private void OnApplicationQuit()
         {
@@ -185,5 +190,37 @@ namespace SimulationNS
             GameController.HandleSecond -= HandleEvent;
             GameController.PrepareSimulation -= ResetPersonPosition;
         }
+
+
+
+
+        // to-do
+
+        public void DeselectPerson()
+        {
+            GameController.instance.currentlySelectedPerson = null;
+            GetComponent<MeshRenderer>().material = normalMaterial;
+        }
+
+        public void SelectPerson()
+        {
+            GameController.instance.currentlySelectedPerson = this;
+            GetComponent<MeshRenderer>().material = hoverMaterial;
+
+            InfoWindow.instance.DisplayInfo(this);
+        }
+
+        //display person info when clicked
+        private void OnMouseDown()
+        {
+            if (GameController.instance.currentlySelectedPerson != null)
+                GameController.instance.currentlySelectedPerson.DeselectPerson();
+            SelectPerson();
+        }
+
+
+
+
+
     }
 }

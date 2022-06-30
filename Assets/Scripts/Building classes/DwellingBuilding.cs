@@ -7,6 +7,7 @@ namespace SimulationNS
 {
     public class DwellingBuilding : Building
     {
+
         [SerializeField]
         public List<Person> persons = new List<Person>();
 

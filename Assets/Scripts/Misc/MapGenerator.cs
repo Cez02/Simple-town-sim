@@ -10,6 +10,8 @@ namespace SimulationNS
 {
     public class MapGenerator : MonoBehaviour
     {
+        public static MapGenerator Instance;
+
         //===========================
         // Map generation variables
         //===========================
@@ -22,6 +24,8 @@ namespace SimulationNS
 
         const int MinimumDistanceBetweenKeyBuildings = 3;
 
+
+
         //===========================
         // Map generation assets
         //===========================
@@ -31,12 +35,14 @@ namespace SimulationNS
         [SerializeField] Transform grassFragmentPrefab, buildingBasePrefab;
         [SerializeField] List<BuildingData> Buildings;
 
+
         //===========================
         // Map generation data
         //===========================
 
         // position and union-find index
         List<KeyValuePair<Vector2Int, int>> keyBuildings = new List<KeyValuePair<Vector2Int, int>>();
+        List<Vector2Int> schoolCoords = new List<Vector2Int>();
         List<Vector2Int> dwellingBuildings = new List<Vector2Int>();
         List<DwellingBuilding> dwellingBuildingsData = new List<DwellingBuilding>();
         List<int> groups = new List<int>();
@@ -142,7 +148,36 @@ namespace SimulationNS
                 }
             }
             ssCounter++;
-            Debug.Log(currentPos.y.ToString() + ", " + currentPos.x.ToString());
+        }
+
+
+        void PlaceSchool()
+        {
+
+            Vector2Int currentPos = new Vector2Int(ran.Next() % mapSize.x, ran.Next() % mapSize.y);
+
+            while (!PositionFarAway(currentPos))
+            {
+                currentPos = new Vector2Int(ran.Next() % mapSize.x, ran.Next() % mapSize.y);
+            }
+
+            keyBuildings.Add(new KeyValuePair<Vector2Int, int>(currentPos, ssCounter));
+            groups.Add(ssCounter);
+
+            for (int i = Mathf.Max(0, currentPos.y - 1); i < Mathf.Min(mapSize.y, currentPos.y + 2); i++)
+            {
+                for (int j = Mathf.Max(0, currentPos.x - 1); j < Mathf.Min(mapSize.x, currentPos.x + 2); j++)
+                {
+                    if (i == currentPos.y && j == currentPos.x)
+                    {
+                        roadMap[i][j] = -2;
+                        continue;
+                    }
+
+                    roadMap[i][j] = ssCounter;
+                }
+            }
+            ssCounter++;
         }
 
         int simpleDis(Vector2Int a, Vector2Int b) { return Mathf.Abs(a.x - b.x) + Mathf.Abs(a.y - b.y);  }
@@ -282,7 +317,8 @@ namespace SimulationNS
             int j = startingPos.x;
             roadMapPrefabs[startingPos.y][startingPos.x].GetComponent<RoadScript>().RoadModified = true;
 
-            Debug.Log(startingPos);
+
+            if (distance % 4 != 0) roadMapPrefabs[i][j].GetComponent<RoadScript>().DeleteLamp();
 
             if (distance%7 != 0)
             {
@@ -312,8 +348,6 @@ namespace SimulationNS
             startingPos.y -= 2;
             CleanUpRoads(startingPos, distance + 1);
         }
-
-        [SerializeField] TextMeshProUGUI txt;
 
         Transform GetBuildingPrefab(BuildingType bt)
         {
@@ -364,6 +398,8 @@ namespace SimulationNS
                 PlaceBuilding();
             }
 
+
+
             // join two unjoined ss
 
             for (int i = 0; i < keyBuildingsCount - 1; i++)
@@ -397,6 +433,26 @@ namespace SimulationNS
 
             CleanUpRoads(cleanUpStartingPos, 1);
 
+            
+            // place schools by roads
+
+            for (int i = 0; i < mapSize.y; i++)
+            {
+                for (int j = 0; j < mapSize.x; j++)
+                {
+                    int roadCount = CountNeighbouringRoads(new Vector2Int(j, i));
+
+                    bool placeSchool = (ran.Next() % 100 <= 4);
+
+                    if (roadMap[i][j] == 0 && roadCount != 0 && placeSchool)
+                    {
+                        schoolCoords.Add(new Vector2Int(j, i));
+                        roadMap[i][j] = -1;
+                    }
+                }
+            }
+
+
             // place homes by roads
 
             for (int i = 0; i < mapSize.y; i++)
@@ -423,6 +479,7 @@ namespace SimulationNS
                 v.position = new Vector3(bld.Key.x * 3, 0, bld.Key.y * 3);
                 var x = Instantiate(buildingBasePrefab);
                 x.position = new Vector3(bld.Key.x * 3, 0, bld.Key.y * 3);
+                v.GetComponent<WorkingBuilding>().SetRandomName();
             }
 
             // place physical dwelling buildings
@@ -435,6 +492,30 @@ namespace SimulationNS
                 x.position = new Vector3(bld.x * 3, 0, bld.y * 3);
 
                 dwellingBuildingsData.Add(v.GetComponent<DwellingBuilding>());
+
+                if (bld.x != 0 && roadMap[bld.y][bld.x - 1] > 0)
+                    v.rotation = Quaternion.Euler(0, 0, 0);
+
+                if (bld.x != mapSize.x - 1 && roadMap[bld.y][bld.x + 1] > 0)
+                    v.rotation = Quaternion.Euler(0, 180, 0);
+
+                if (bld.y != 0 && roadMap[bld.y - 1][bld.x] > 0)
+                    v.rotation = Quaternion.Euler(0, -90, 0);
+
+                if (bld.y != mapSize.y - 1 && roadMap[bld.y + 1][bld.x] > 0)
+                    v.rotation = Quaternion.Euler(0, 90, 0);
+            }
+
+            // place physical school building
+
+            foreach (var bld in schoolCoords)
+            {
+                var v = Instantiate(GetBuildingPrefab(BuildingType.School));
+                v.position = new Vector3(bld.x * 3, 0, bld.y * 3);
+                var x = Instantiate(buildingBasePrefab);
+                x.position = new Vector3(bld.x * 3, 0, bld.y * 3);
+
+                v.GetComponent<SchoolBuilding>().SetName("School #" + GameController.RandomNumberGenerator.Next() % 10);
 
                 if (bld.x != 0 && roadMap[bld.y][bld.x - 1] > 0)
                     v.rotation = Quaternion.Euler(0, 0, 0);
@@ -476,17 +557,12 @@ namespace SimulationNS
 
         }
 
+        public void SetSeed(string x) { seed = x; }
 
-        // Start is called before the first frame update
-        void Start()
+        private void Start()
         {
-
+            Instance = this;
         }
 
-        // Update is called once per frame
-        void Update()
-        {
-
-        }
     }
 }
